@@ -31,3 +31,6 @@
 [submodule "io/tty/lib_log"]
 	path = io/tty/lib_log
 	url = https://github.com/tom3333/lib_log.git
+[submodule "os_base/lib_stm32hal"]
+	path = os_base/lib_stm32hal
+	url = https://github.com/tom3333/lib_stm32hal.git
