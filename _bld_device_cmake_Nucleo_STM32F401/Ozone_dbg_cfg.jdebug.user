@@ -1,0 +1,8 @@
+OpenWindow="Memory Content1", DockArea=BOTTOM, x=0, y=0, w=1283, h=314, FilterBarShown=0, 
+OpenWindow="Registers", DockArea=RIGHT, x=0, y=1, w=300, h=498, FilterBarShown=0, 
+OpenWindow="Functions", DockArea=LEFT, x=0, y=0, w=387, h=997, FilterBarShown=1, 
+OpenWindow="Disassembly", DockArea=RIGHT, x=0, y=0, w=300, h=498, FilterBarShown=0, ExecCountersShown=0
+OpenWindow="Console", DockArea=BOTTOM, x=1, y=0, w=1276, h=314, FilterBarShown=0, 
+OpenToolbar="Debug", Floating=0, x=0, y=0
+TableHeader="Registers", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Description"], ColWidths=[115;100;259]
+TableHeader="Functions", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Address";"Size";"#Insts";"Source"], ColWidths=[43;55;34;43;196]

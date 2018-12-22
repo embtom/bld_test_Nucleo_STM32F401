@@ -1,0 +1,33 @@
+[submodule "os_base/freertos"]
+	path = os_base/freertos
+	url = https://github.com/tom3333/freertos.git
+[submodule "os_base/lib_clock"]
+	path = os_base/lib_clock
+	url = https://github.com/tom3333/lib_clock.git
+[submodule "os_base/lib_convention"]
+	path = os_base/lib_convention
+	url = https://github.com/tom3333/lib_convention.git
+[submodule "os_base/lib_list"]
+	path = os_base/lib_list
+	url = https://github.com/tom3333/lib_list.git
+[submodule "os_base/mini-printf"]
+	path = os_base/mini-printf
+	url = https://github.com/tom3333/mini-printf.git
+[submodule "os_base/lib_thread"]
+	path = os_base/lib_thread
+	url = https://github.com/tom3333/lib_thread.git
+[submodule "os_base/lib_timer"]
+	path = os_base/lib_timer
+	url = https://github.com/tom3333/lib_timer.git
+[submodule "io/gpio/lib_gpio"]
+	path = io/gpio/lib_gpio
+	url = https://github.com/tom3333/lib_gpio.git
+[submodule "io/tty/lib_ser"]
+	path = io/tty/lib_ser
+	url = https://github.com/tom3333/lib_ser.git
+[submodule "io/tty/lib_tty_portmux"]
+	path = io/tty/lib_tty_portmux
+	url = https://github.com/tom3333/lib_tty_portmux.git
+[submodule "io/tty/lib_log"]
+	path = io/tty/lib_log
+	url = https://github.com/tom3333/lib_log.git
