@@ -1,18 +1,26 @@
-/* ****************************************************************************************************
- * test application for unit tests
- *
- *  compiler:   GNU Tools ARM LINUX
- *  target:     armv6
- *  author:	    Tom
- * ****************************************************************************************************/
-
-/* ****************************************************************************************************/
-
 /*
- *	******************************* change log *******************************
- *  date			user			comment
- * 	27 Juli 2018	Tom				- creation of app_test.c
+ * This file is part of the EMBTOM project
+ * Copyright (c) 2018-2019 Thomas Willetal 
+ * (https://github.com/tom3333)
  *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 /* *******************************************************************
@@ -31,7 +39,7 @@
 /* frame */
 #include <lib_thread.h>
 #include <lib_menu.h>
-#include <lib_tty_portmux.h>
+#include <lib_ttyportmux.h>
 #include <test_cases.h>
 #include <mini-printf.h>
 
@@ -48,9 +56,9 @@
 static int app_test__setup_tty_portmux_menu(void);
 static void app_test__menu_item_settty(struct lib_menu__item *_item);
 static void app_test__menu_item_gettty(struct lib_menu__item *_item);
-static void app_test__print_tty_devices(void);
-static void app_test__print_tty_streams(unsigned int *_stream_number);
-static void app_test__get_tty_devices(unsigned int _device_idx, const struct device_info **_device_info);
+static void app_test__print_ttydevices(void);
+static void app_test__print_ttystreams(unsigned int *_stream_number);
+static void app_test__get_ttydevices(unsigned int _device_idx, const struct ttyDeviceInfo **_ttydevice_info);
 static void app_test__menu_cb_trigger(struct lib_menu__item *_item);
 
 
@@ -100,7 +108,7 @@ int app_test__init(void)
 		return ret;
 	}
 
-	ret = lib_tty_portmux__print(TTY_STREAM_CONTROL,"\n\n\nWelcome to the Test APP Manger\n\n");
+	ret = lib_ttyportmux__print(TTYSTREAM_control,"\n\n\nWelcome to the Test APP Manger\n\n");
 	if (ret < EOK) {
 		return ret;
 	}
@@ -165,18 +173,20 @@ static void app_test__menu_item_settty(struct lib_menu__item *_item)
 {
 	int ret;
 	unsigned int stream_number, stream_selector, device_selector;
-	const struct device_info *device_info;
+	const struct ttyDeviceInfo *deviceInfo;
+	struct ttyStreamMap mapping[TTYSTREAM_CNT];
 
-	app_test__print_tty_devices();
-	app_test__print_tty_streams(&stream_number);
-	lib_tty_portmux__print(TTY_STREAM_CONTROL,"%u - Switch all streams\n",stream_number);
+	app_test__print_ttydevices();
+	app_test__print_ttystreams(&stream_number);
+	lib_ttyportmux__print(TTYSTREAM_control,"%u - Switch all streams\n",stream_number);
 	
 	stream_selector = lib_menu__get_int__decimal("Select tty stream to change");
 	device_selector = lib_menu__get_int__decimal("Set tty device for selected stream");
 
-	app_test__get_tty_devices(device_selector, &device_info);
-	ret = lib_tty_portmux__set_stream_device((enum tty_stream)stream_selector, device_info);
-
+	app_test__get_ttydevices(device_selector, &deviceInfo);
+	lib_ttyportmux__get_stream_mapping(&mapping[0], sizeof(mapping));
+	mapping[stream_selector].deviceType = deviceInfo->deviceType;
+	lib_ttyportmux__set_stream_mapping(&mapping[0], sizeof(mapping));
 }
 
 /* ************************************************************************//**
@@ -192,74 +202,64 @@ static void app_test__menu_item_gettty(struct lib_menu__item *_item)
 	
 	char *device_name;
 
-	app_test__print_tty_devices();
-	app_test__print_tty_streams(NULL);
+	app_test__print_ttydevices();
+	app_test__print_ttystreams(NULL);
 }
 
-static void app_test__print_tty_devices(void)
+static void app_test__print_ttydevices(void)
 {
-	int i, ret;
-	device_list_t device_node_hdl = NULL;
-	const struct device_info *device_info;
+	int i;
+	struct ttyDeviceInfo* deviceInfo;
+	struct list_node *itr_node;
+	struct list_node *first_node = lib_ttyportmux__get_ttydevice_listentry();
 
-	lib_tty_portmux__print(TTY_STREAM_CONTROL,"\nList of available tty devices:\n");
-	ret = EOK;
-	i=0;
-	do{
-		ret = lib_tty_portmux__get_device_info(&device_node_hdl, &device_info);
-		if (ret == EOK) {
-			lib_tty_portmux__print(TTY_STREAM_CONTROL,"%u - %s(%u)\n",i, device_info->device_type_name,device_info->device_index);
-			i++;
-		}
-	}while (ret == EOK);
+	lib_ttyportmux__print(TTYSTREAM_control,"\nList of available tty devices:\n");
+	
+	i = 0;
+	lib__ttyportmux_listentry_foreach(itr_node, first_node)
+	{
+		deviceInfo = lib_ttyportmux__get_ttydevice_info(itr_node);
+		lib_ttyportmux__print(TTYSTREAM_control,"%u - %s(%u)\n",i, deviceInfo->deviceName,deviceInfo->deviceIndex);
+		i++;
+	}
 }
 
-static void app_test__get_tty_devices(unsigned int _device_idx, const struct device_info **_device_info)
+static void app_test__get_ttydevices(unsigned int _device_idx, const struct ttyDeviceInfo **_ttydevice_info)
 {
 	int ret, i;
-	int device_number;
-	device_list_t device_node_hdl = NULL;
-	const struct device_info *device_info;
+	struct ttyDeviceInfo* deviceInfo;
+	struct list_node *itr_node;
+	struct list_node *first_node = lib_ttyportmux__get_ttydevice_listentry();
 
-	device_number = lib_tty_portmux__get_device_number();
-	for(i=0; i < device_number; i++) 
+	i = 0;
+	lib__ttyportmux_listentry_foreach(itr_node, first_node)
 	{
-		ret = lib_tty_portmux__get_device_info(&device_node_hdl, &device_info);
-		if(ret != EOK) {
-			return;
-		}
+		deviceInfo = lib_ttyportmux__get_ttydevice_info(itr_node);
 		if (_device_idx == i) {
-			*_device_info = device_info;
+			*_ttydevice_info = deviceInfo;
 			return;
 		}
+		i++;
 	}
 }
 
-
-static void app_test__print_tty_streams(unsigned int *_stream_number)
+static void app_test__print_ttystreams(unsigned int *_stream_number)
 {
 	int i, stream_count, ret;
-	struct stream_info info;
+	struct ttyStreamInfo info;
+	struct ttyStreamMap mapping[TTYSTREAM_CNT];
+	struct ttyStreamInfo streamInfo;
 
-	lib_tty_portmux__print(TTY_STREAM_CONTROL,"\nList of available tty devices:\n");
+	lib_ttyportmux__print(TTYSTREAM_control,"\nList of available tty devices:\n");
+	lib_ttyportmux__get_stream_mapping(&mapping[0], sizeof(mapping));
+	for(i = 0; i< sizeof(mapping)/sizeof(struct ttyStreamMap); i++) {
+		lib_ttyportmux__get_stream_info(&mapping[i], &streamInfo);
+		lib_ttyportmux__print(TTYSTREAM_control,"%u - %s - %s(%u)\n", i, streamInfo.streamName, streamInfo.deviceName, streamInfo.deviceIndex);
 
-	ret = lib_tty_portmux__get_stream_number();
-	if(ret < EOK) {
-		lib_tty_portmux__print(TTY_STREAM_CONTROL,"No device found error with %i\n",ret);
-		return ;
-	}
-
-	stream_count = ret;
-	for(i = 0; i < stream_count; i++) {
-		ret = lib_tty_portmux__get_stream_info((enum tty_stream)i, &info);
-		if (ret < EOK) {
-			lib_tty_portmux__print(TTY_STREAM_CONTROL,"Device info request failed %i\n",ret);
-		}
-		lib_tty_portmux__print(TTY_STREAM_CONTROL,"%u - %s - %s(%u)\n", i, info.stream_name, info.device_type_name, info.device_index);
-	}
+	} 
 
 	if (_stream_number != NULL) {
-		*_stream_number = i;
+		*_stream_number = lib_ttyportmux__get_stream_count();
 	}
 }
 
@@ -273,7 +273,7 @@ static void app_test__menu_cb_trigger(struct lib_menu__item *_item)
 {
 	struct embunitTestContainer *testContainer = (struct embunitTestContainer *)GET_CONTAINER_OF(_item, struct embunitTestContainer, menu_item);
 	embunit_t embunitTests;
-	lib_tty_portmux__print(TTY_STREAM_CONTROL,"Start of Test Case %s\n",testContainer->name);
+	lib_ttyportmux__print(TTYSTREAM_control,"Start of Test Case %s\n",testContainer->menu_item.ident);
 	if(testContainer->embunitTests != NULL) {
 		embunitTests = testContainer->embunitTests; 
 		TestRunner_start();

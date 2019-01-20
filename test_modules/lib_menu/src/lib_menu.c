@@ -1,18 +1,26 @@
-/* ****************************************************************************************************
- * lib_menu.c for console print out
- *
- *  compiler:   GNU Tools ARM LINUX
- *  target:     armv6
- *  author:	    Tom
- * ****************************************************************************************************/
-
-/* ****************************************************************************************************/
-
 /*
- *	******************************* change log *******************************
- *  date			user			comment
- * 	07 Juli 2018	Tom				- creation of lib_console.c
+ * This file is part of the EMBTOM project
+ * Copyright (c) 2018-2019 Thomas Willetal 
+ * (https://github.com/tom3333)
  *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 /* *******************************************************************
@@ -30,7 +38,7 @@
 
 /* own libs */
 #include <mini-printf.h>
-#include <lib_tty_portmux.h>
+#include <lib_ttyportmux.h>
 #include <lib_log.h>
 
 /* project */
@@ -174,15 +182,15 @@ float lib_menu__get_float(const char *_title)
 
     cmd_in_size = sizeof(s_cmd_in);
     
-    lib_tty_portmux__print(TTY_STREAM_CONTROL, "Enter '%s' (float): ", _title == NULL ? "integer value": _title);
-    ret = lib_tty_portmux__getline(TTY_STREAM_CONTROL,&s_cmd_in[0], &cmd_in_size);
+    lib_ttyportmux__print(TTYSTREAM_control, "Enter '%s' (float): ", _title == NULL ? "integer value": _title);
+    ret = lib_ttyportmux__getline(TTYSTREAM_control,&s_cmd_in[0], &cmd_in_size);
     if (ret < EOK) {
        	msg(LOG_LEVEL_error, M_LIB_MENU_NAME, "%s() getline failed with ret %i", __func__, ret);
        	return ret;
     }
 
     mini_sscanf(&s_cmd_in[0], "%f", &ret);
-    lib_tty_portmux__print(TTY_STREAM_CONTROL,"\n");
+    lib_ttyportmux__print(TTYSTREAM_control,"\n");
     return ret;
 }
 
@@ -195,15 +203,15 @@ int lib_menu__get_int__decimal(const char *_title)
         return -ESTD_INVAL;
 
     cmd_in_size = sizeof(s_cmd_in);
-    lib_tty_portmux__print(TTY_STREAM_CONTROL,"Enter '%s' (int, decimal): ", _title == NULL ? "integer value": _title);
-    ret = lib_tty_portmux__getline(TTY_STREAM_CONTROL, &s_cmd_in[0], &cmd_in_size);
+    lib_ttyportmux__print(TTYSTREAM_control,"Enter '%s' (int, decimal): ", _title == NULL ? "integer value": _title);
+    ret = lib_ttyportmux__getline(TTYSTREAM_control, &s_cmd_in[0], &cmd_in_size);
     if (ret < EOK) {
     	msg(LOG_LEVEL_error, M_LIB_MENU_NAME, "%s() getline failed with ret %i", __func__, ret);
     	return ret;
     }
 
     mini_sscanf(&s_cmd_in[0], "%i", &ret);
-    lib_tty_portmux__print(TTY_STREAM_CONTROL,"\n");
+    lib_ttyportmux__print(TTYSTREAM_control,"\n");
     return ret;
 }
 
@@ -216,15 +224,15 @@ int lib_menu__get_int__hex(const char *_title)
         return -ESTD_INVAL;
 
     cmd_in_size = sizeof(s_cmd_in);
-    lib_tty_portmux__print(TTY_STREAM_CONTROL, "Enter '%s' (int, hex - e.g.:0xA3): ", _title == NULL ? "integer value": _title);
-    ret = lib_tty_portmux__getline(TTY_STREAM_CONTROL, &s_cmd_in[0], &cmd_in_size);
+    lib_ttyportmux__print(TTYSTREAM_control, "Enter '%s' (int, hex - e.g.:0xA3): ", _title == NULL ? "integer value": _title);
+    ret = lib_ttyportmux__getline(TTYSTREAM_control, &s_cmd_in[0], &cmd_in_size);
     if (ret < EOK) {
     	msg(LOG_LEVEL_error, M_LIB_MENU_NAME, "%s() getline failed with ret %i", __func__, ret);
     	return ret;
     }
 
     mini_sscanf(&s_cmd_in[0], "0x%x", &ret);
-    lib_tty_portmux__print(TTY_STREAM_CONTROL,"\n");
+    lib_ttyportmux__print(TTYSTREAM_control,"\n");
     return ret;
 }
 
@@ -236,14 +244,14 @@ static void lib_menu__item_help(struct lib_menu__item *_item)
 {
     int i;
 
-    lib_tty_portmux__print(TTY_STREAM_CONTROL,"Help:\n");
+    lib_ttyportmux__print(TTYSTREAM_control,"Help:\n");
 
     /* print all menu items */
     for (i = 0; i < LIB_MENU__CONF_LISTSIZE_MENUITEMS; i++)
     {
         if (s_menu_list[i].cb == NULL)
             continue;
-        lib_tty_portmux__print(TTY_STREAM_CONTROL,"%s - %s\n", s_menu_list[i].cmd, s_menu_list[i].ident);
+        lib_ttyportmux__print(TTYSTREAM_control,"%s - %s\n", s_menu_list[i].cmd, s_menu_list[i].ident);
     }
 
     return;
@@ -254,14 +262,14 @@ static void lib_menu__item_setll(struct lib_menu__item *_item)
     int verbosity_switch;
     enum log_level verbosity;
 
-    lib_tty_portmux__print(TTY_STREAM_CONTROL,"\n");
-    lib_tty_portmux__print(TTY_STREAM_CONTROL,"Verbosity Levels:\n");
-    lib_tty_portmux__print(TTY_STREAM_CONTROL,"%s %i\n", "0 LOG_LEVEL_debug", LOG_LEVEL_debug);
-    lib_tty_portmux__print(TTY_STREAM_CONTROL,"%s %i\n", "1 LOG_LEVEL_debug", LOG_LEVEL_debug);
-    lib_tty_portmux__print(TTY_STREAM_CONTROL,"%s %i\n", "2 LOG_LEVEL_info", LOG_LEVEL_info);
-    lib_tty_portmux__print(TTY_STREAM_CONTROL,"%s %i\n", "3 LOG_LEVEL_warning", LOG_LEVEL_warning);
-    lib_tty_portmux__print(TTY_STREAM_CONTROL,"%s %i\n", "4 LOG_LEVEL_error", LOG_LEVEL_error);
-    lib_tty_portmux__print(TTY_STREAM_CONTROL,"%s %i\n", "5 LOG_LEVEL_critical", LOG_LEVEL_critical);
+    lib_ttyportmux__print(TTYSTREAM_control,"\n");
+    lib_ttyportmux__print(TTYSTREAM_control,"Verbosity Levels:\n");
+    lib_ttyportmux__print(TTYSTREAM_control,"%s %i\n", "0 LOG_LEVEL_debug", LOG_LEVEL_debug);
+    lib_ttyportmux__print(TTYSTREAM_control,"%s %i\n", "1 LOG_LEVEL_debug", LOG_LEVEL_debug);
+    lib_ttyportmux__print(TTYSTREAM_control,"%s %i\n", "2 LOG_LEVEL_info", LOG_LEVEL_info);
+    lib_ttyportmux__print(TTYSTREAM_control,"%s %i\n", "3 LOG_LEVEL_warning", LOG_LEVEL_warning);
+    lib_ttyportmux__print(TTYSTREAM_control,"%s %i\n", "4 LOG_LEVEL_error", LOG_LEVEL_error);
+    lib_ttyportmux__print(TTYSTREAM_control,"%s %i\n", "5 LOG_LEVEL_critical", LOG_LEVEL_critical);
 
     verbosity_switch = lib_menu__get_int__decimal("Verbosity selector");
 
@@ -274,7 +282,7 @@ static void lib_menu__item_setll(struct lib_menu__item *_item)
     	case 4: verbosity = LOG_LEVEL_error; break;
         case 5: verbosity = LOG_LEVEL_critical; break;
     	default: {
-    		lib_tty_portmux__print(TTY_STREAM_CONTROL,"Invalid verbosity selected\n");
+    		lib_ttyportmux__print(TTYSTREAM_control,"Invalid verbosity selected\n");
     		return;
     	}
     }
@@ -285,7 +293,7 @@ static void lib_menu__item_getll(struct lib_menu__item *_item)
 {
 	int verbosity;
 	verbosity = lib_log__get_level();
-	lib_tty_portmux__print(TTY_STREAM_CONTROL,"Current verbosity level %u\n", verbosity);
+	lib_ttyportmux__print(TTYSTREAM_control,"Current verbosity level %u\n", verbosity);
 }
 
 
@@ -293,10 +301,10 @@ static void lib_menu__item_q(struct lib_menu__item *_item)
 {
     s_quiet = s_quiet == 0 ? 1 : 0;
     if (s_quiet == 0) {
-    	lib_tty_portmux__print(TTY_STREAM_CONTROL,"Quiet mode off!\n");
+    	lib_ttyportmux__print(TTYSTREAM_control,"Quiet mode off!\n");
     }
     if (s_quiet == 1) {
-    	lib_tty_portmux__print(TTY_STREAM_CONTROL,"Quiet mode on!\n");
+    	lib_ttyportmux__print(TTYSTREAM_control,"Quiet mode on!\n");
     }
     return;
 }
@@ -309,22 +317,23 @@ static void lib_menu__item_q(struct lib_menu__item *_item)
 static void *thread_menu(void *_arg)
 {
 	int ret;
-    size_t cmd_in_size;
+    size_t cmd_in_size = 0;
     int  len_in;
     int  len_cmd;
     int  i;
 
 
-    ret = lib_tty_portmux__getline(TTY_STREAM_CONTROL,&s_cmd_in[0], &cmd_in_size);
+    ret = lib_ttyportmux__getline(TTYSTREAM_control,&s_cmd_in[0], &cmd_in_size);
     if (ret < EOK) {
-    	lib_tty_portmux__print(TTY_STREAM_CONTROL,"Menu thread terminated with %i (line %i)\n",ret,__LINE__);
+    	lib_ttyportmux__print(TTYSTREAM_control,"Menu thread terminated with %i (line %i)\n",ret,__LINE__);
     }
 
     do
     {
+        s_cmd_in[cmd_in_size-1] = '\0';
         /* error */
         if (ret == LIB_MENU__CONF_CMDLENGTH) {
-        	lib_tty_portmux__print(TTY_STREAM_CONTROL, "Error: Command Too Long\n");
+        	lib_ttyportmux__print(TTYSTREAM_control, "Error: Command Too Long\n");
             lib_menu__item_help(NULL);
             continue;
         }
@@ -353,7 +362,7 @@ static void *thread_menu(void *_arg)
             if(memcmp(&s_cmd_in[0], s_menu_list[i].cmd, len_cmd) == 0)
             {
                 s_menu_list[i].cb(s_menu_list[i].menu_item_desc);
-                lib_tty_portmux__print(TTY_STREAM_CONTROL,"<done>\n");
+                lib_ttyportmux__print(TTYSTREAM_control,"<done>\n");
                 break;
             }
         }
@@ -361,14 +370,14 @@ static void *thread_menu(void *_arg)
         /* check: command not found */
         if (i == LIB_MENU__CONF_LISTSIZE_MENUITEMS)
         {
-        	lib_tty_portmux__print(TTY_STREAM_CONTROL, "Error: Command not found \n");
+        	lib_ttyportmux__print(TTYSTREAM_control, "Error: Command not found \n");
             lib_menu__item_help(NULL);
         }
 
         cmd_in_size = sizeof(s_cmd_in);
-    } while (ret = lib_tty_portmux__getline(TTY_STREAM_CONTROL,&s_cmd_in[0], &cmd_in_size), ret == EOK);
+    } while (ret = lib_ttyportmux__getline(TTYSTREAM_control,&s_cmd_in[0], &cmd_in_size), ret == EOK);
 
-    lib_tty_portmux__print(TTY_STREAM_CONTROL,"Menu thread terminated with %i (line %i)\n",ret,__LINE__);
+    lib_ttyportmux__print(TTYSTREAM_control,"Menu thread terminated with %i (line %i)\n",ret,__LINE__);
 
     return NULL;
 }
