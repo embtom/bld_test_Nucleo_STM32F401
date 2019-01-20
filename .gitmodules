@@ -22,9 +22,6 @@
 [submodule "io/gpio/lib_gpio"]
 	path = io/gpio/lib_gpio
 	url = https://github.com/tom3333/lib_gpio.git
-[submodule "io/tty/lib_ser"]
-	path = io/tty/lib_ser
-	url = https://github.com/tom3333/lib_ser.git
 [submodule "io/tty/lib_tty_portmux"]
 	path = io/tty/lib_tty_portmux
 	url = https://github.com/tom3333/lib_tty_portmux.git
