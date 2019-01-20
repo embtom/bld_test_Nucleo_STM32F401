@@ -31,9 +31,9 @@
 [submodule "os_base/lib_stm32hal"]
 	path = os_base/lib_stm32hal
 	url = https://github.com/tom3333/lib_stm32hal.git
-[submodule "io/tty/lib_console"]
-	path = io/tty/lib_console
-	url = git@tomhp.fritz.box:submodule/lib_console.git
 [submodule "io/tty/lib_serial"]
 	path = io/tty/lib_serial
-	url = git@tomhp.fritz.box:submodule/lib_serial.git
+	url = https://github.com/tom3333/lib_serial.git
+[submodule "io/tty/lib_console"]
+	path = io/tty/lib_console
+	url = https://github.com/tom3333/lib_console.git
