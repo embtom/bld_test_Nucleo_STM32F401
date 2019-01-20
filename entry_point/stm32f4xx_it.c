@@ -40,7 +40,8 @@
 #include "stm32f4xx_it.h"
 #include <stm32f4xx_hal_tim.h>
 #include <isr_hdl.h>
-#include <lib_ser_init_itf.h>
+#include <lib_serial_stm32.h>
+//#include <lib_ser_init_itf.h>
 
 /** @addtogroup STM32F4xx_HAL_Examples
   * @{
@@ -196,7 +197,7 @@ void TIM4_IRQHandler (void)
 
 void USART2_IRQHandler (void)
 {
-	isr_hdl__isr_processing(ISR_ID_uart2,LIB_SER_ISR_TYPE_uart);
+  isr_hdl__isr_processing(ISR_ID_uart2,LIB_SER_ISR_TYPE_uart);
 }
 
 void DMA1_Stream6_IRQHandler(void)
