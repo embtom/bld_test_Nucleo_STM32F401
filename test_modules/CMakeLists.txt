@@ -8,4 +8,4 @@ add_subdirectory(app_test)
 add_subdirectory(lib_menu)
 add_subdirectory(lib_test_cases)
 add_subdirectory(lib_test_framework_EMBUNIT)
-
+#add_subdirectory(test_lib_thread)
