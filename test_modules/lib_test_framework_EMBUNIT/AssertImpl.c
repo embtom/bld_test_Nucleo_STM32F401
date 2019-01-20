@@ -56,9 +56,11 @@ void assertImplementationInt(int expected,int actual, long line, const char *fil
 
 void assertImplementationInt_loop(int loop_cnt, int expected,int actual, long line, const char *file)
 {
-	char buffer[32];	/*"exp -2147483647 was -2147483647"*/
+	char buffer[40];	/*"exp -2147483647 was -2147483647"*/
 
-	sprintf (buffer, "loop_cnt: %d ... exp: %d ... was %d", loop_cnt, expected, actual);
+	stdimpl_sprintf(buffer,sizeof(buffer),"loop_cnt: %i ... exp: %i ... was %i", loop_cnt, expected, actual);
+
+	//sprintf (buffer, "loop_cnt: %i ... exp: %i ... was %i", loop_cnt, expected, actual);
 
 	addFailure(buffer, line, file);
 }
@@ -66,9 +68,9 @@ void assertImplementationInt_loop(int loop_cnt, int expected,int actual, long li
 
 void assertImplementationInt_Hex(int expected,int actual, long line, const char *file)
 {
-	char buffer[32];	/*"exp -2147483647 was -2147483647"*/
+	char buffer[40];	/*"exp -2147483647 was -2147483647"*/
 
-	sprintf (buffer, "exp: 0x%08X ... was: 0x%08X", expected, actual);
+	stdimpl_sprintf(buffer,sizeof(buffer), "exp: 0x%08X ... was: 0x%08X", expected, actual);
 
 	addFailure(buffer, line, file);
 }
@@ -89,7 +91,7 @@ int assertImplementationFloat(float expected,float actual, float deviation, long
 
 	if (percent < deviation) return 0;
 
-	sprintf (buffer, "exp: %.4f ... was: %.4f ... dif: %.f ... deviation: %f%%", expected, actual, dif, percent);
+	stdimpl_sprintf(buffer,sizeof(buffer), "exp: %.4f ... was: %.4f ... dif: %.f ... deviation: %f%%", expected, actual, dif, percent);
 
 	addFailure(buffer, line, file);
 	return 1;
@@ -111,7 +113,7 @@ int assertImplementationFloat_loop(unsigned int loop_cnt, float expected,float a
 
 	if (percent < deviation) return 0;
 
-	sprintf (buffer, "loop_cnt: %d ... exp: %.4f ... was: %.4f ... dif: %f ... deviation: %f%%", loop_cnt, expected, actual, dif, percent);
+	stdimpl_sprintf(buffer,sizeof(buffer), "loop_cnt: %d ... exp: %.4f ... was: %.4f ... dif: %f ... deviation: %f%%", loop_cnt, expected, actual, dif, percent);
 
 	addFailure(buffer, line, file);
 	return 1;

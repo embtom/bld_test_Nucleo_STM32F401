@@ -38,9 +38,9 @@
 /*	#define NO_STDIO_PRINTF*/
 	#ifdef	NO_STDIO_PRINTF
 		extern void stdimpl_print(const char *string);
-	#elif DEV_TRACE_PRINTF
-		#include<lib_tty_portmux.h>
-		#define stdimpl_print(_string) lib_tty_portmux__print(TTY_STREAM_CONTROL,_string)
+	#elif TTY_PORTMUX
+		#include<lib_ttyportmux.h>
+		#define stdimpl_print(...) lib_ttyportmux__print(TTYSTREAM_control,__VA_ARGS__)
 	#else
 		#include<stdio.h>
 		#define stdimpl_print printf
@@ -49,10 +49,21 @@
 
 	#ifdef	NO_STDIO_VPRINTF
 		extern void stdimpl_print(const char *string);
-	#elif DEV_TRACE_VPRINTF
-		#define stdimpl_vprintf(format, arglist) lib_tty_portmux__vprint(TTY_STREAM_CONTROL,format,arglist)
+	#elif TTY_PORTMUX
+		#define stdimpl_vprintf(format, arglist) lib_ttyportmux__vprint(TTYSTREAM_control,format,arglist)
 	#else
 		#define stdimpl_vprintf vprintf
+	#endif
+	
+	#ifdef NO_STDIO_SPRINTF
+	//	extern void stdimpl_sprintf(char *buffer, size_t size, const char* _fmt, ...);
+	#elif MINI_PRINTF
+		#include <mini-printf.h>
+		#define stdimpl_sprintf(buffer, size, format,...) mini_snprintf(buffer,size,format,__VA_ARGS__)
+	#else
+		#include<stdio.h>
+		#define stdimpl_sprintf(buffer, size, format,...) sprintf(buffer,format,__VA_ARGS__)
+
 	#endif
 
 	#define ASSERT_STRING_BUFFER_MAX	64
